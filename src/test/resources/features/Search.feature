@@ -1,7 +1,7 @@
 @search
 Feature: Check Search Feature
 
-  @test
+  @test @abcg
   Scenario: Search Any Iphone in Amazon
     Given User searches "iPhone 16 Pro Max" in Amazon Portal
     And User selects and adds the random phone in Cart
