@@ -1,0 +1,50 @@
+name: Automation Testing Pipeline
+
+on:
+  schedule:
+    - cron: "10 17 * * *"  # Runs every day at 21:15 UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  automation-tests:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Print Date & Time (Windows)
+        run: Get-Date
+        shell: pwsh
+
+      - name: Set up Java (JDK 11)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+#      - name: Install Chrome and ChromeDriver
+#        run: |
+#          choco install googlechrome -y --ignore-checksums
+#          choco install chromedriver -y
+#          chromedriver --version
+
+      - name: Grant Execute Permission to Gradle (For Linux/macOS)
+        if: runner.os != 'Windows'
+        run: chmod +x gradlew
+
+      - name: Build Project with Gradle
+        run: .\gradlew.bat build --info  # Windows users
+
+      #      - name: Run Automation Tests
+      #        run: .\gradlew.bat test --info  # Ensure Gradle runs tests with logs
+
+      #      - name: Run Tests Using Maven and TestNG
+      #        run: mvn test -DsuiteXmlFile=src/test/resources/runner/testng.xml
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/tests/test
